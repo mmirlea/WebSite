@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- mapper의 전체 경로 -->
+<mapper namespace="com.green.board.dao.CommentsMapper">
+	
+	<!-- 파라미터 타입은 1개 : 받아올 타입, 2개 : map, 3개 : Dto -->
+	<!-- 게시글의 댓글 전체 삭제 -->
+	<delete id="deleteAll" parameterType="int">
+		DELETE FROM comments
+		WHERE bno = #{bno}
+	</delete>
+	
+	<!-- 게시글의 댓글 개수 확인 -->
+	<select id="count" parameterType="int" resultType="int">
+		SELECT count(*)
+		FROM comments
+		WHERE bno = #{bno}
+	</select>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="delete" parameterType="map">
+		DELETE FROM comments
+		WHERE cno = #{cno} AND commenter = #{commenter}
+	</delete>
+	
+	<!-- 댓글 추가 parameterType alias로 별칭 정한거-->
+	<insert id="insert" parameterType="CommentsDto">
+		INSERT INTO comments(cno, bno, pcno, comments, commenter, reg_date, up_date)
+		VALUES (cno_seq.nextval, #{bno}, #{pcno}, #{comments}, #{commenter}, SYSDATE, SYSDATE)
+	</insert>
+	
+	<!-- 게시글의 댓글 모두 검색 -->
+	<select id="selectAll" parameterType="int" resultType="CommentsDto">
+		SELECT cno, bno, nvl(pcno, cno) pcno, comments, commenter, reg_date, up_date
+		FROM comments
+		WHERE bno = #{bno}
+		ORDER BY pcno ASC, cno ASC
+	</select>
+	
+	<!-- 댓글 번호에 따른 댓글 내용 확인하기 -->
+	<select id="select" parameterType="int" resultType="CommentsDto">
+		SELECT cno, bno, pcno, comments, commenter, reg_date, up_date
+		FROM comments
+		WHERE cno = #{cno}
+	</select>
+	
+	<!-- 댓글 변경하기 -->
+	<update id="update" parameterType="CommentsDto">
+		UPDATE comments
+		SET comments = #{comments}, up_date = SYSDATE
+		WHERE cno = #{cno} AND commenter = #{commenter}
+	</update>
+</mapper>
